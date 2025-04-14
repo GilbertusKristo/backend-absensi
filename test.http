@@ -1,0 +1,94 @@
+POST http://localhost:3000/api/users
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username" : "kristo",
+  "password" : "kukuruyuk",
+  "name" : "gilbertus"
+}
+
+###
+
+POST http://localhost:3000/api/users/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username" : "kristo",
+  "password" : "kukuruyuk"
+}
+
+###800f3a16-cf3a-40cf-9220-ca6d1703342b
+
+GET http://localhost:3000/api/users/current
+Content-Type: application/json
+Accept: application/json
+Authorization: 800f3a16-cf3a-40cf-9220-ca6d1703342b
+
+###
+
+PATCH http://localhost:3000/api/users/current
+Content-Type: application/json
+Accept: application/json
+Authorization: 800f3a16-cf3a-40cf-9220-ca6d1703342b
+
+{
+  "name" : "Halo Kristo AKu"
+}
+
+###
+
+DELETE http://localhost:3000/api/users/logout
+Content-Type: application/json
+Accept: application/json
+Authorization: 800f3a16-cf3a-40cf-9220-ca6d1703342b
+
+###
+
+POST http://localhost:3000/api/contacts
+Content-Type: application/json
+Accept: application/json
+Authorization: 44e30e9b-6f14-4103-98d1-e3b3fe746c84
+
+{
+  "first_name" : "Joko",
+  "last_name" : "Morro",
+  "email" : "gilbertuskristo@gmail.com",
+  "phone" : "324234234234"
+}
+
+###
+
+GET http://localhost:3000/api/contacts
+Content-Type: application/json
+Accept: application/json
+Authorization: 44e30e9b-6f14-4103-98d1-e3b3fe746c84
+
+###
+
+GET http://localhost:3000/api/contacts/2
+Content-Type: application/json
+Accept: application/json
+Authorization: 44e30e9b-6f14-4103-98d1-e3b3fe746c84
+
+### Update
+
+PUT http://localhost:3000/api/contacts/2
+Content-Type: application/json
+Accept: application/json
+Authorization: 44e30e9b-6f14-4103-98d1-e3b3fe746c84
+
+{
+  "first_name": "yanto",
+  "last_name": "balap",
+  "email": "yantobalap@gmail.com",
+  "phone": "324234234234"
+}
+
+### Delete Contact
+
+DELETE http://localhost:3000/api/contacts/2
+Content-Type: application/json
+Accept: application/json
+Authorization: 44e30e9b-6f14-4103-98d1-e3b3fe746c84
