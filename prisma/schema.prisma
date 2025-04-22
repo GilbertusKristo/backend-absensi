@@ -14,11 +14,13 @@ datasource db {
 }
 
 model User {
-  username String     @id @db.VarChar(100)
-  password String     @db.VarChar(100)
-  name     String     @db.VarChar(100)
-  token    String?    @db.VarChar(100)
-  Contacts Contacts[]
+  username    String       @id @db.VarChar(100)
+  password    String       @db.VarChar(100)
+  name        String       @db.VarChar(100)
+  token       String?      @db.VarChar(100)
+  descriptor  Json?
+  Contacts    Contacts[]
+  attendances Attendance[]
 
   @@map("users")
 }
@@ -33,4 +35,12 @@ model Contacts {
   user       User    @relation(fields: [username], references: [username])
 
   @@map("contacts")
+}
+
+model Attendance {
+  id       Int      @id @default(autoincrement())
+  username String   @db.VarChar(100)
+  date     DateTime
+  status   String
+  user     User     @relation(fields: [username], references: [username])
 }

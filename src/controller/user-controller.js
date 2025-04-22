@@ -1,18 +1,21 @@
 import userService from "../service/user-service.js";
+import { registerValidation } from "../validation/user-validation.js";
+import { validate } from "../validation/validation.js";
 
 const register = async (req, res, next) => {
     try {
-        const result = await userService.register(req.body);
-        res.status(200).json({
+        const userData = validate(registerValidation, req.body);
+        const result = await userService.register(userData);
+        res.status(201).json({
             data: result
         });
     } catch (e) {
         next(e);
     }
-}
+};
 
 const login = async (req, res, next) => {
-    try{
+    try {
         const result = await userService.login(req.body);
         res.status(200).json({
             data: result
@@ -20,8 +23,7 @@ const login = async (req, res, next) => {
     } catch (e) {
         next(e);
     }
-}
-
+};
 
 const get = async (req, res, next) => {
     try {
@@ -33,7 +35,7 @@ const get = async (req, res, next) => {
     } catch (e) {
         next(e);
     }
-}
+};
 
 const update = async (req, res, next) => {
     try {
@@ -48,7 +50,7 @@ const update = async (req, res, next) => {
     } catch (e) {
         next(e);
     }
-}
+};
 
 const logout = async (req, res, next) => {
     try {
@@ -59,7 +61,7 @@ const logout = async (req, res, next) => {
     } catch (e) {
         next(e);
     }
-}
+};
 
 export default {
     register,
@@ -67,4 +69,4 @@ export default {
     get,
     update,
     logout
-}
+};

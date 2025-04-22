@@ -24,14 +24,14 @@ Accept: application/json
 GET http://localhost:3000/api/users/current
 Content-Type: application/json
 Accept: application/json
-Authorization: 800f3a16-cf3a-40cf-9220-ca6d1703342b
+Authorization: ece2219e-230f-4a3f-a83e-ad628bf960cc
 
 ###
 
 PATCH http://localhost:3000/api/users/current
 Content-Type: application/json
 Accept: application/json
-Authorization: 800f3a16-cf3a-40cf-9220-ca6d1703342b
+Authorization: ece2219e-230f-4a3f-a83e-ad628bf960cc
 
 {
   "name" : "Halo Kristo AKu"
@@ -42,14 +42,14 @@ Authorization: 800f3a16-cf3a-40cf-9220-ca6d1703342b
 DELETE http://localhost:3000/api/users/logout
 Content-Type: application/json
 Accept: application/json
-Authorization: 800f3a16-cf3a-40cf-9220-ca6d1703342b
+Authorization: ece2219e-230f-4a3f-a83e-ad628bf960cc
 
 ###
 
 POST http://localhost:3000/api/contacts
 Content-Type: application/json
 Accept: application/json
-Authorization: 44e30e9b-6f14-4103-98d1-e3b3fe746c84
+Authorization: 756b024a-5bce-4d76-b465-39759cc68d2f
 
 {
   "first_name" : "Joko",
@@ -63,21 +63,21 @@ Authorization: 44e30e9b-6f14-4103-98d1-e3b3fe746c84
 GET http://localhost:3000/api/contacts
 Content-Type: application/json
 Accept: application/json
-Authorization: 44e30e9b-6f14-4103-98d1-e3b3fe746c84
+Authorization: 756b024a-5bce-4d76-b465-39759cc68d2f
 
 ###
 
-GET http://localhost:3000/api/contacts/2
+GET http://localhost:3000/api/contacts/1
 Content-Type: application/json
 Accept: application/json
-Authorization: 44e30e9b-6f14-4103-98d1-e3b3fe746c84
+Authorization: 756b024a-5bce-4d76-b465-39759cc68d2f
 
 ### Update
 
-PUT http://localhost:3000/api/contacts/2
+PUT http://localhost:3000/api/contacts/1
 Content-Type: application/json
 Accept: application/json
-Authorization: 44e30e9b-6f14-4103-98d1-e3b3fe746c84
+Authorization: 756b024a-5bce-4d76-b465-39759cc68d2f
 
 {
   "first_name": "yanto",
@@ -88,7 +88,7 @@ Authorization: 44e30e9b-6f14-4103-98d1-e3b3fe746c84
 
 ### Delete Contact
 
-DELETE http://localhost:3000/api/contacts/2
+DELETE http://localhost:3000/api/contacts/1
 Content-Type: application/json
 Accept: application/json
-Authorization: 44e30e9b-6f14-4103-98d1-e3b3fe746c84
+Authorization: 756b024a-5bce-4d76-b465-39759cc68d2f
