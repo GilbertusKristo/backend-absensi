@@ -38,9 +38,13 @@ model Contacts {
 }
 
 model Attendance {
-  id       Int      @id @default(autoincrement())
-  username String   @db.VarChar(100)
-  date     DateTime
-  status   String
-  user     User     @relation(fields: [username], references: [username])
+  id          Int      @id @default(autoincrement())
+  username    String   @db.VarChar(100)
+  date        DateTime
+  status      String
+  latitude    Float?
+  longitude   Float?
+  user        User     @relation(fields: [username], references: [username])
+
+  @@map("attendances")
 }

@@ -59,6 +59,12 @@ export const registerFace = async (req, res, next) => {
 
 export const matchFace = async (req, res, next) => {
     try {
+        const { latitude, longitude } = req.body;
+
+        if (!latitude || !longitude || isNaN(latitude) || isNaN(longitude)) {
+            return res.status(400).json({ error: 'Latitude dan longitude harus dikirim dan berbentuk angka' });
+        }
+
         if (!req.file) throw new ResponseError(400, 'File tidak ditemukan');
 
         const image = await canvas.loadImage(req.file.path);
@@ -95,7 +101,9 @@ export const matchFace = async (req, res, next) => {
                 data: {
                     username: bestMatch.username,
                     date: new Date(),
-                    status: 'Hadir'
+                    status: 'Hadir',
+                    latitude: parseFloat(latitude),
+                    longitude: parseFloat(longitude),
                 }
             });
 
