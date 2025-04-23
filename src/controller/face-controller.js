@@ -4,56 +4,62 @@ import * as faceapi from 'face-api.js';
 import * as tf from '@tensorflow/tfjs';
 import canvas from 'canvas';
 import { prismaClient } from '../application/database.js';
+import { ResponseError } from '../error/response-error.js';
 
 const { Canvas, Image, ImageData } = canvas;
 faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
 
-await tf.setBackend('cpu');
-await tf.ready();
-
+// Load model hanya sekali (bisa pindah ke file setup.js biar modular)
 const MODEL_PATH = path.join(process.cwd(), 'models');
 await Promise.all([
-    faceapi.nets.ssdMobilenetv1.loadFromDisk(MODEL_PATH),
+    faceapi.nets.tinyFaceDetector.loadFromDisk(MODEL_PATH),
     faceapi.nets.faceRecognitionNet.loadFromDisk(MODEL_PATH),
-    faceapi.nets.faceLandmark68Net.loadFromDisk(MODEL_PATH)
+    faceapi.nets.faceLandmark68Net.loadFromDisk(MODEL_PATH),
 ]);
+
+const detectorOptions = new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.5 });
+
+// Resize image ke 320x320
+const resizeImage = (image) => {
+    const newCanvas = canvas.createCanvas(320, 320);
+    const ctx = newCanvas.getContext('2d');
+    ctx.drawImage(image, 0, 0, 320, 320);
+    return newCanvas;
+};
 
 export const registerFace = async (req, res, next) => {
     try {
-        const username = req.user.username;
-        
-        const user = await prismaClient.user.findUnique({
-            where: { username },
-        });
+        const username = req.user?.username;
 
-        if (!user) {
-            throw new ResponseError(404, "User not found");
-        }
+        if (!req.file) throw new ResponseError(400, 'File tidak ditemukan');
+        if (!username) throw new ResponseError(401, 'Unauthorized');
+
+        const user = await prismaClient.user.findUnique({ where: { username } });
+        if (!user) throw new ResponseError(404, "User tidak ditemukan");
 
         const image = await canvas.loadImage(req.file.path);
+        const resized = resizeImage(image);
+
         const detection = await faceapi
-            .detectSingleFace(image)
+            .detectSingleFace(resized, detectorOptions)
             .withFaceLandmarks()
             .withFaceDescriptor();
 
-        if (!detection) {
-            throw new ResponseError(400, "Wajah tidak terdeteksi");
-        }
+        if (!detection) throw new ResponseError(400, "Wajah tidak terdeteksi");
 
         const descriptor = Array.from(detection.descriptor);
 
-        
         const updatedUser = await prismaClient.user.update({
             where: { username },
             data: { descriptor },
-            select: {
-                username: true,
-                name: true,
-            },
+            select: { username: true, name: true },
         });
 
+        // Hapus file setelah selesai
+        fs.unlinkSync(req.file.path);
+
         res.status(201).json({
-            message: "Face data registered successfully",
+            message: "Face data berhasil diregistrasi",
             data: updatedUser,
         });
     } catch (e) {
@@ -61,26 +67,23 @@ export const registerFace = async (req, res, next) => {
     }
 };
 
-
 export const matchFace = async (req, res, next) => {
     try {
+        if (!req.file) throw new ResponseError(400, 'File tidak ditemukan');
+
         const image = await canvas.loadImage(req.file.path);
+        const resized = resizeImage(image);
+
         const detection = await faceapi
-            .detectSingleFace(image)
+            .detectSingleFace(resized, detectorOptions)
             .withFaceLandmarks()
             .withFaceDescriptor();
 
-        if (!detection) {
-            return res.status(400).json({ error: 'Wajah tidak terdeteksi' });
-        }
+        if (!detection) throw new ResponseError(400, 'Wajah tidak terdeteksi');
 
         const descriptor = detection.descriptor;
         const users = await prismaClient.user.findMany({
-            where: {
-                descriptor: {
-                    not: null
-                }
-            }
+            where: { descriptor: { not: null } }
         });
 
         let bestMatch = null;
@@ -96,6 +99,8 @@ export const matchFace = async (req, res, next) => {
             }
         }
 
+        fs.unlinkSync(req.file.path);
+
         if (bestMatch) {
             await prismaClient.attendance.create({
                 data: {
@@ -105,15 +110,16 @@ export const matchFace = async (req, res, next) => {
                 }
             });
 
-            res.status(200).json({ message: 'Wajah cocok', user: {
+            return res.status(200).json({
+                message: 'Wajah cocok',
                 user: {
                     name: bestMatch.name,
                     username: bestMatch.username,
                     status: 'Hadir',
                 }
-            } });
+            });
         } else {
-            res.status(404).json({ message: 'Tidak ditemukan kecocokan wajah' });
+            return res.status(404).json({ message: 'Tidak ditemukan kecocokan wajah' });
         }
     } catch (error) {
         next(error);
