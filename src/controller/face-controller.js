@@ -9,7 +9,6 @@ import { ResponseError } from '../error/response-error.js';
 const { Canvas, Image, ImageData } = canvas;
 faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
 
-// Load model hanya sekali (bisa pindah ke file setup.js biar modular)
 const MODEL_PATH = path.join(process.cwd(), 'models');
 await Promise.all([
     faceapi.nets.tinyFaceDetector.loadFromDisk(MODEL_PATH),
@@ -18,14 +17,6 @@ await Promise.all([
 ]);
 
 const detectorOptions = new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.5 });
-
-// Resize image ke 320x320
-const resizeImage = (image) => {
-    const newCanvas = canvas.createCanvas(320, 320);
-    const ctx = newCanvas.getContext('2d');
-    ctx.drawImage(image, 0, 0, 320, 320);
-    return newCanvas;
-};
 
 export const registerFace = async (req, res, next) => {
     try {
@@ -38,10 +29,9 @@ export const registerFace = async (req, res, next) => {
         if (!user) throw new ResponseError(404, "User tidak ditemukan");
 
         const image = await canvas.loadImage(req.file.path);
-        const resized = resizeImage(image);
 
         const detection = await faceapi
-            .detectSingleFace(resized, detectorOptions)
+            .detectSingleFace(image, detectorOptions)
             .withFaceLandmarks()
             .withFaceDescriptor();
 
@@ -72,10 +62,9 @@ export const matchFace = async (req, res, next) => {
         if (!req.file) throw new ResponseError(400, 'File tidak ditemukan');
 
         const image = await canvas.loadImage(req.file.path);
-        const resized = resizeImage(image);
 
         const detection = await faceapi
-            .detectSingleFace(resized, detectorOptions)
+            .detectSingleFace(image, detectorOptions)
             .withFaceLandmarks()
             .withFaceDescriptor();
 
